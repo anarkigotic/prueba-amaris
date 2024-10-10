@@ -43,7 +43,6 @@ def main(event, context):
             'body': json.dumps({'message': 'No se encontraron transacciones para este cliente.'})
         }
     else:
-        # Convierte todos los Decimal a float en la lista de transacciones
         transactions = [convert_decimals_to_floats(t) for t in transactions]
         
         response = {

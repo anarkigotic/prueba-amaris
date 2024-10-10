@@ -151,7 +151,6 @@ def unsubscribe_fund(userId, fundId):
     
     return add_cors_headers(response)
 
-# Handler principal
 def main(event, context):
     body_json = json.loads(event['body'])
     userId = body_json['userId']

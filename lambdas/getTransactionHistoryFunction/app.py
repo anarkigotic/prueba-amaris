@@ -2,7 +2,7 @@ import json
 import boto3
 from boto3.dynamodb.conditions import Key
 import os
-
+from decimal import Decimal
 
 REGION = os.environ['REGION']
 TRANSACTION_HISTORY_TABLE = os.environ['TRANSACTION_HISTORY_TABLE']
@@ -10,6 +10,16 @@ TRANSACTION_HISTORY_TABLE = os.environ['TRANSACTION_HISTORY_TABLE']
 dynamodb = boto3.resource('dynamodb')
 transactions_table = dynamodb.Table(TRANSACTION_HISTORY_TABLE)  
 
+
+def convert_decimals_to_floats(item):
+    """Convierte recursivamente los Decimals en un diccionario a floats."""
+    if isinstance(item, dict):
+        return {k: convert_decimals_to_floats(v) for k, v in item.items()}
+    elif isinstance(item, list):
+        return [convert_decimals_to_floats(i) for i in item]
+    elif isinstance(item, Decimal):
+        return float(item)
+    return item
 
 def get_client_transactions(cliente_id):
     response = transactions_table.query(
@@ -33,6 +43,8 @@ def main(event, context):
             'body': json.dumps({'message': 'No se encontraron transacciones para este cliente.'})
         }
     else:
+        transactions = [convert_decimals_to_floats(t) for t in transactions]
+        
         response = {
             'statusCode': 200,
             'body': json.dumps(transactions)

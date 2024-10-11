@@ -223,6 +223,8 @@ Resources:
             TableName: !Ref SubscriptionsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref FundsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
 
   
     

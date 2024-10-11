@@ -48,7 +48,7 @@ def get_all_funds():
             funds.append({
                 'fundId': item['PK'],  
                 'name': item.get('Name', ''), 
-                'minimumInvestment': item.get('MinimumInvestment', 0),  
+                'MinimumInvestment': item.get('MinimumInvestment', 0),  
             })
     except Exception as e:
         print(f"Error al obtener fondos: {str(e)}")

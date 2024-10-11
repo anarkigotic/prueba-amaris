@@ -246,6 +246,9 @@ Resources:
       - DynamoDBCrudPolicy:
           TableName:
             Ref: FundsTable
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: ClientsTable
     Metadata:
       SamResourceId: GetSubscriptionsFunction
 Outputs:

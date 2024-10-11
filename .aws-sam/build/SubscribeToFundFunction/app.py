@@ -19,6 +19,16 @@ ransaction_history_table = dynamodb.Table(TRANSACTION_HISTORY_TABLE)
 ses_client = boto3.client('ses', region_name=REGION)  
 
 
+def update_client_balance(client_id, new_balance):
+    try:
+        clients_table.update_item(
+            Key={'PK': client_id},
+            UpdateExpression='SET Balance = :new_balance',
+            ExpressionAttributeValues={':new_balance': new_balance}
+        )
+    except Exception as e:
+        print(f"Error updating client balance: {str(e)}")
+
 def send_email(subject, recipient, title, heading, message, userId, fundId):
     # Carga y renderiza la plantilla de Mako
     template = Template(filename='template.html.mako')
@@ -113,7 +123,6 @@ def main(event, context):
     body_json = json.loads(event['body'])
     userId = body_json['userId']
     fundId = body_json['fundId']
-    amount = body_json['amount']
 
     existing_subscription = get_client_subscription(userId, fundId)
     
@@ -147,6 +156,8 @@ def main(event, context):
         }
         return add_cors_headers(response)
         
+    amount = fund_info['MinimumInvestment']
+    update_client_balance(userId,client_balance - fund_info['MinimumInvestment'])
     subscription_item = {
         'PK': userId,
         'SK': fundId, 
@@ -157,7 +168,7 @@ def main(event, context):
     subscriptions_table.put_item(Item=subscription_item)
     
     record_transaction(userId, fundId, amount, "subscription")
-    send_email("suscript a nueva cuenta", "anarkigotic@gmail.com", "titlle test", "heading", "message test", userId, fundId)
+    # send_email("suscript a nueva cuenta", "anarkigotic@gmail.com", "titlle test", "heading", "message test", userId, fundId)
 
     response = {
         'statusCode': 200,
@@ -165,7 +176,7 @@ def main(event, context):
             'message': 'Suscripción realizada con éxito',
             'userId': userId,
             'fundId': fundId,
-            'amount': amount
+            'amount': str(amount)
         })
     }
     

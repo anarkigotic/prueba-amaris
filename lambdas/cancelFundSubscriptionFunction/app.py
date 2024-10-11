@@ -19,6 +19,7 @@ clients_table = dynamodb.Table(CLIENTS_TABLE)
 transaction_history_table = dynamodb.Table(TRANSACTION_HISTORY_TABLE)
 ses_client = boto3.client('ses', region_name=REGION)
 
+
 def send_email(subject, recipient, title, heading, message, userId, fundId):
     template = Template(filename='template.html.mako')
     body_html = template.render(
@@ -100,7 +101,6 @@ def unsubscribe_fund(userId, fundId):
             ExpressionAttributeValues={':new_balance': new_balance}
         )
     except Exception as e:
-        print(f"Error updating client balance: {str(e)}")
         response = {
             'statusCode': 500,
             'body': json.dumps({
@@ -128,15 +128,16 @@ def unsubscribe_fund(userId, fundId):
         }
         return add_cors_headers(response)
 
-    send_email(
-        subject="Desuscripción confirmada",
-        recipient="anarkigotic@gmail.com",
-        title="Desuscripción de Fondo",
-        heading="Has sido desuscrito exitosamente",
-        message=f"Has sido desuscrito del fondo con ID {fundId} y el monto de {amount} ha sido devuelto a tu balance.",
-        userId=userId,
-        fundId=fundId
-    )
+    # send_email(
+    #     subject="Desuscripción confirmada",
+    #     recipient="anarkigotic@gmail.com",
+    #     title="Desuscripción de Fondo",
+    #     heading="Has sido desuscrito exitosamente",
+    #     message=f"Has sido desuscrito del fondo con ID {fundId} y el monto de {amount} ha sido devuelto a tu balance.",
+    #     userId=userId,
+    #     fundId=fundId
+    # )
+    
     
     response = {
         'statusCode': 200,
